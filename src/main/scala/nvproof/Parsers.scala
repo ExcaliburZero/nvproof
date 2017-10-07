@@ -1,9 +1,15 @@
 package nvproof
 
 import scala.util.parsing.combinator._
+import scala.util.parsing.combinator.token.Tokens
 
 object Parsers extends RegexParsers {
   override val skipWhitespace = false
+  private val eol = sys.props("line.separator")
+
+  def proof: Parser[AST.Proof] = {
+    rep(step <~ eol)
+  }
 
   def step: Parser[Step] = {
     lineNumber ~ ") " ~ statement ~ " " ~ rule ^^ {

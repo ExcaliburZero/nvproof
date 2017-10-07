@@ -20,5 +20,6 @@ case class Assumption() extends Rule
 case class ModusPonens(lineNumber1: AST.LineNumber, lineNumber2: AST.LineNumber) extends Rule
 
 object AST {
+  type Proof = List[Step]
   type LineNumber = Int
 }

@@ -71,11 +71,21 @@ class ParsersTests extends FlatSpec with Matchers {
 
     val output = Parsers.parse(Parsers.step, input)
 
-    output match {
-      case Parsers.Success(matched,_) => println(matched)
-      case Parsers.Failure(msg,_) => println("FAILURE: " + msg)
-      case Parsers.Error(msg,_) => println("ERROR: " + msg)
-    }
+    output.successful shouldBe true
+    output.get shouldBe expected
+  }
+
+  it should "parse a proof" in {
+    val input = "1) (P ⇒ Q) AS\n" +
+                "2) P AS\n" + 
+                "3) Q MP 1, 2\n"
+    val expected = List(
+        Step(1, BinaryExpression(Symbol('P'), Implication(), Symbol('Q')), Assumption())
+      , Step(2, Symbol('P'), Assumption())
+      , Step(3, Symbol('Q'), ModusPonens(1, 2))
+    )
+
+    val output = Parsers.parse(Parsers.proof, input)
 
     output.successful shouldBe true
     output.get shouldBe expected
