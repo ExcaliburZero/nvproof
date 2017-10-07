@@ -1,6 +1,12 @@
 # nvproof
 A logic proof validator.
 
+```
+1) (P ⇒ Q) AS
+2) P AS
+3) Q MP 1, 2
+```
+
 ## Grammar
 ```
 proof ::= [<step>]
