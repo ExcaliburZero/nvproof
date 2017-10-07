@@ -43,6 +43,10 @@ case class ModusPonens(lineNumber1: AST.LineNumber, lineNumber2: AST.LineNumber)
   override def toString(): String = f"MP $lineNumber1, $lineNumber2"
 }
 
+case class Contraposition(lineNumber: AST.LineNumber) extends Rule {
+  override def toString(): String = f"Contra $lineNumber"
+}
+
 
 object AST {
   type Proof = List[Step]

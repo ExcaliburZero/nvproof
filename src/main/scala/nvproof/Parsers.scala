@@ -67,7 +67,7 @@ object Parsers extends RegexParsers {
   }
 
   def rule: Parser[Rule] = {
-    assumption | modusPonens
+    assumption | modusPonens | contraposition
   }
 
   def assumption: Parser[Rule] = {
@@ -77,6 +77,12 @@ object Parsers extends RegexParsers {
   def modusPonens: Parser[Rule] = {
     "MP " ~ lineNumber ~ ", " ~ lineNumber ^^ {
       case _ ~ ln1 ~ _ ~ ln2 => ModusPonens(ln1, ln2)
+    }
+  }
+
+  def contraposition: Parser[Rule] = {
+    "Contra " ~ lineNumber ^^ {
+      case _ ~ ln => Contraposition(ln)
     }
   }
 }

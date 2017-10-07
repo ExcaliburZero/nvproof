@@ -21,6 +21,7 @@ object Validation {
     rule match {
       case Assumption() => None
       case ModusPonens(ln1, ln2) => validateModusPonens(proof, step, ln1, ln2)
+      case Contraposition(ln) => validateContraposition(proof, step, ln)
     }
   }
 
@@ -42,6 +43,34 @@ object Validation {
           }
         } else {
           Some(ErrorMessage(start + f"first operand on line $ln1 ($a) != line $ln2 ($l2)"))
+        }
+      case _ =>
+        Some(ErrorMessage(start + f"line $ln1 does not have implication as its primary operation: $l1"))
+    }
+  }
+
+  def validateContraposition(proof: AST.Proof, step: Step, ln1: AST.LineNumber): Option[ErrorMessage] = {
+    val l1 = getStep(proof, ln1).statement
+
+    val ln = step.lineNumber
+    val statement = step.statement
+    val start = f"Invalid Contra on line $ln: "
+
+    l1 match {
+      case BinaryExpression(a, Implication(), b) =>
+        statement match {
+          case BinaryExpression(UnaryExpression(Not(), a2), Implication(), UnaryExpression(Not(), b2)) =>
+            if (a == b2) {
+              if (b == a2) {
+                None
+              } else {
+                Some(ErrorMessage(start + f"second operand on line $ln1 ($b) != un-negated first operand on line $ln ($a2)"))
+              }
+            } else {
+              Some(ErrorMessage(start + f"first operand on line $ln1 ($a) != un-negated second operand on line $ln ($b2)"))
+            }
+          case _ =>
+            Some(ErrorMessage(start + f"line $ln does not have the correct structure for contraposition: $statement"))
         }
       case _ =>
         Some(ErrorMessage(start + f"line $ln1 does not have implication as its primary operation: $l1"))
