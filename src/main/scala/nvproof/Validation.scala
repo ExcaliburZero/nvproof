@@ -22,6 +22,8 @@ object Validation {
       case Assumption() => None
       case ModusPonens(ln1, ln2) => validateModusPonens(proof, step, ln1, ln2)
       case Contraposition(ln) => validateContraposition(proof, step, ln)
+      case DoubleNegation(ln) => validateDoubleNegation(proof, step, ln)
+      case M1() => validateM1(step)
     }
   }
 
@@ -77,7 +79,58 @@ object Validation {
     }
   }
 
+  def validateDoubleNegation(proof: AST.Proof, step: Step, ln1: AST.LineNumber): Option[ErrorMessage] = {
+    val l1 = getStep(proof, ln1).statement
+
+    val ln = step.lineNumber
+    val statement = step.statement
+    val start = f"Invalid DN* on line $ln: "
+
+    val statementNoDN = removeDoubleNegations(statement)
+    val l1NoDN = removeDoubleNegations(l1)
+
+    if (statementNoDN == l1NoDN) {
+      None
+    } else {
+      Some(ErrorMessage(start + f"line $ln is not equivalent to line $ln1 through DN*"))
+    }
+  }
+
+  def validateM1(step: Step): Option[ErrorMessage] = {
+    val ln = step.lineNumber
+    val statement = step.statement
+    val start = f"Invalid M1 on line $ln: "
+
+    statement match {
+      case BinaryExpression(a, Implication(), b) =>
+        a match {
+          case UnaryExpression(Necessary(), a2) =>
+            if (a2 == b) {
+              None
+            } else {
+              Some(ErrorMessage(start + f"first operand on line $ln without necessitation ($a2) != second operand on line $ln ($b)"))
+            }
+          case _ =>
+            Some(ErrorMessage(start + f"first operand on line $ln is does not have necessitation ($a)"))
+        }
+      case _ =>
+        Some(ErrorMessage(start + f"line $ln does not have the correct structure for an instance of M1"))
+    }
+  }
+
   private def getStep(proof: AST.Proof, lineNumber: AST.LineNumber): Step = {
     proof(lineNumber - 1)
+  }
+
+  private def removeDoubleNegations(statement: Statement): Statement = {
+    statement match {
+      case UnaryExpression(Not(), UnaryExpression(Not(), a)) =>
+        removeDoubleNegations(a)
+      case UnaryExpression(op, a) =>
+        UnaryExpression(op, removeDoubleNegations(a))
+      case BinaryExpression(a, op, b) =>
+        BinaryExpression(removeDoubleNegations(a), op, removeDoubleNegations(b))
+      case a => a
+    }
   }
 }

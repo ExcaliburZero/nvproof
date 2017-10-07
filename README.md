@@ -11,7 +11,7 @@ A logic proof validator.
 ```
 proof ::= [<step>]
 
-step ::= <line_number> ") " <statement> "\t" <rule>
+step ::= <line_number> ") " <statement> " " <rule>
 
 line_number ::= positive integer
 
@@ -28,4 +28,6 @@ binary_operator ::= "->"
 rule ::= "AS"
   | "MP " <line_number> "," <line_number>
   | "Contra " <line_number>
+  | "DN* " <line_number>
+  | "M1"
 ```

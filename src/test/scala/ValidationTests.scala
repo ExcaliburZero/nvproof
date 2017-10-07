@@ -50,4 +50,26 @@ class ValidationTests extends FlatSpec with Matchers {
 
     output shouldBe expected
   }
+
+  it should "pass a valid proof with double negation" in {
+    val input = "1) ~([]P -> <>~~~Q) AS\n" +
+                "2) ~~~(~~[]P -> <>~Q) DN* 1\n"
+    val expected = None
+
+    val proof = Parsers.parse(Parsers.proof, input).get
+    val output = Validation.validate(proof)
+
+    output shouldBe expected
+  }
+
+  it should "fail a invalid proof with double negation" in {
+    val input = "1) (P -> Q) AS\n" +
+                "3) (~P -> ~Q) DN* 1\n"
+    val expected = Some(List(ErrorMessage("Invalid DN* on line 3: line 3 is not equivalent to line 1 through DN*")))
+
+    val proof = Parsers.parse(Parsers.proof, input).get
+    val output = Validation.validate(proof)
+
+    output shouldBe expected
+  }
 }

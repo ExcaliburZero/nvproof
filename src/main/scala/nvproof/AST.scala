@@ -47,6 +47,14 @@ case class Contraposition(lineNumber: AST.LineNumber) extends Rule {
   override def toString(): String = f"Contra $lineNumber"
 }
 
+case class DoubleNegation(lineNumber: AST.LineNumber) extends Rule {
+  override def toString(): String = f"DN* $lineNumber"
+}
+
+case class M1() extends Rule {
+  override def toString(): String = f"M1"
+}
+
 
 object AST {
   type Proof = List[Step]
