@@ -55,6 +55,10 @@ case class M1() extends Rule {
   override def toString(): String = f"M1"
 }
 
+case class ByDefModal(lineNumber: AST.LineNumber) extends Rule {
+  override def toString(): String = f"$lineNumber by def modal"
+}
+
 
 object AST {
   type Proof = List[Step]

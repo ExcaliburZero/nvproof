@@ -24,6 +24,7 @@ object Validation {
       case Contraposition(ln) => validateContraposition(proof, step, ln)
       case DoubleNegation(ln) => validateDoubleNegation(proof, step, ln)
       case M1() => validateM1(step)
+      case ByDefModal(ln) => validateByDefModal(proof, step, ln)
     }
   }
 
@@ -118,6 +119,23 @@ object Validation {
     }
   }
 
+  def validateByDefModal(proof: AST.Proof, step: Step, ln1: AST.LineNumber): Option[ErrorMessage] = {
+    val l1 = getStep(proof, ln1).statement
+
+    val ln = step.lineNumber
+    val statement = step.statement
+    val start = f"Invalid by def modal on line $ln: "
+
+    val statementNoPossible = removePossible(statement)
+    val l1NoPossible = removePossible(l1)
+
+    if (statementNoPossible == l1NoPossible) {
+      None
+    } else {
+      Some(ErrorMessage(start + f"line $ln is not equivalent to line $ln1 through by def modal"))
+    }
+  }
+
   private def getStep(proof: AST.Proof, lineNumber: AST.LineNumber): Step = {
     proof(lineNumber - 1)
   }
@@ -130,6 +148,20 @@ object Validation {
         UnaryExpression(op, removeDoubleNegations(a))
       case BinaryExpression(a, op, b) =>
         BinaryExpression(removeDoubleNegations(a), op, removeDoubleNegations(b))
+      case a => a
+    }
+  }
+
+  private def removePossible(statement: Statement): Statement = {
+    statement match {
+      case UnaryExpression(Not(), UnaryExpression(Possible(), UnaryExpression(Not(), a))) =>
+        UnaryExpression(Necessary(), removePossible(a))
+      case UnaryExpression(Possible(), a) =>
+        UnaryExpression(Not(), UnaryExpression(Necessary(), UnaryExpression(Not(), a)))
+      case UnaryExpression(op, a) =>
+        UnaryExpression(op, removePossible(a))
+      case BinaryExpression(a, op, b) =>
+        BinaryExpression(removePossible(a), op, removePossible(b))
       case a => a
     }
   }
