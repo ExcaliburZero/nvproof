@@ -21,9 +21,12 @@ sealed trait UnaryOperator
 case class Not() extends UnaryOperator {
   override def toString(): String = "~"
 }
-
-case class Necessary() extends UnaryOperator
-case class Possible() extends UnaryOperator
+case class Necessary() extends UnaryOperator {
+  override def toString(): String = "□"
+}
+case class Possible() extends UnaryOperator {
+  override def toString(): String = "⋄"
+}
 
 sealed trait BinaryOperator
 case class Implication() extends BinaryOperator {

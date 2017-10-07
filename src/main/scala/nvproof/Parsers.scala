@@ -36,11 +36,19 @@ object Parsers extends RegexParsers {
   }
 
   def unaryOperator: Parser[UnaryOperator] = {
-    not
+    not | necessary | possible
   }
 
   def not: Parser[UnaryOperator] = {
     "~" ^^ { _ => Not() }
+  }
+
+  def necessary: Parser[UnaryOperator] = {
+    "□" ^^ { _ => Necessary() }
+  }
+
+  def possible: Parser[UnaryOperator] = {
+    "⋄" ^^ { _ => Possible() }
   }
 
   def binaryExpression: Parser[Statement] = {
