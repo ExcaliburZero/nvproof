@@ -9,7 +9,7 @@ step ::= <line_number> ") " <statement> "\t" <rule>
 
 line_number ::= positive integer
 
-statement ::= <unary_expression> | <binary_expression> | symbol
+statement ::= <binary_expression> | <unary_expression> | symbol
 
 unary_expression ::= <unary_operator> <statement>
 

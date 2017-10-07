@@ -45,9 +45,29 @@ class ParsersTests extends FlatSpec with Matchers {
     output.get shouldBe expected
   }
 
+  it should "parse a binary expression" in {
+    val input = "(P ⇒ Q)"
+    val expected = BinaryExpression(Symbol('P'), Implication(), Symbol('Q'))
+
+    val output = Parsers.parse(Parsers.binaryExpression, input)
+
+    output.successful shouldBe true
+    output.get shouldBe expected
+  }
+
   it should "parse a step" in {
     val input = "10) ~P MP 1, 2"
     val expected = Step(10, UnaryExpression(Not(), Symbol('P')), ModusPonens(1, 2))
+
+    val output = Parsers.parse(Parsers.step, input)
+
+    output.successful shouldBe true
+    output.get shouldBe expected
+  }
+
+  it should "parse a step with a binary expression" in {
+    val input = "10) (~Q ⇒ P) AS"
+    val expected = Step(10, BinaryExpression(UnaryExpression(Not(), Symbol('Q')), Implication(), Symbol('P')), Assumption())
 
     val output = Parsers.parse(Parsers.step, input)
 

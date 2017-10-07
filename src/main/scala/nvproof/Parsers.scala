@@ -16,7 +16,7 @@ object Parsers extends RegexParsers {
   }
 
   def statement: Parser[Statement] = {
-    unaryExpression | symbol
+    binaryExpression | unaryExpression | symbol
   }
 
   def unaryExpression: Parser[UnaryExpression] = {
@@ -35,6 +35,20 @@ object Parsers extends RegexParsers {
 
   def not: Parser[UnaryOperator] = {
     "~" ^^ { _ => Not() }
+  }
+
+  def binaryExpression: Parser[Statement] = {
+    "(" ~ statement ~ " " ~ binaryOperator ~ " " ~ statement ~ ")" ^^ {
+      case _ ~ st1 ~ _ ~ op ~ _ ~ st2 ~ _ => BinaryExpression(st1, op, st2)
+    }
+  }
+
+  def binaryOperator: Parser[BinaryOperator] = {
+    implication
+  }
+
+  def implication: Parser[BinaryOperator] = {
+    "⇒" ^^ { _ => Implication() }
   }
 
   def rule: Parser[Rule] = {
