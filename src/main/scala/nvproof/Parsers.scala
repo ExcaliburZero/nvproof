@@ -6,9 +6,10 @@ import scala.util.parsing.combinator.token.Tokens
 object Parsers extends RegexParsers {
   override val skipWhitespace = false
   private val eol = sys.props("line.separator")
+  private val eof = "\\z".r
 
   def proof: Parser[AST.Proof] = {
-    rep(step <~ eol)
+    rep(step <~ eol) <~ eof
   }
 
   def step: Parser[Step] = {
