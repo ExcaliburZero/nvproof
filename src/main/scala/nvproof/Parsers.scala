@@ -45,11 +45,11 @@ object Parsers extends RegexParsers {
   }
 
   def necessary: Parser[UnaryOperator] = {
-    "□" ^^ { _ => Necessary() }
+    "[]" ^^ { _ => Necessary() }
   }
 
   def possible: Parser[UnaryOperator] = {
-    "⋄" ^^ { _ => Possible() }
+    "<>" ^^ { _ => Possible() }
   }
 
   def binaryExpression: Parser[Statement] = {
@@ -63,7 +63,7 @@ object Parsers extends RegexParsers {
   }
 
   def implication: Parser[BinaryOperator] = {
-    "⇒" ^^ { _ => Implication() }
+    "->" ^^ { _ => Implication() }
   }
 
   def rule: Parser[Rule] = {

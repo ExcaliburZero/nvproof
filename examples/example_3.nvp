@@ -1,5 +1,5 @@
-1) (P ⇒ (Q ⇒ R)) AS
+1) (P -> (Q -> R)) AS
 2) P AS
 3) Q AS
-4) (Q ⇒ R) MP 1, 2
+4) (Q -> R) MP 1, 2
 5) R MP 4, 3

@@ -2,7 +2,7 @@
 A logic proof validator.
 
 ```
-1) (P ⇒ Q) AS
+1) (P -> Q) AS
 2) P AS
 3) Q MP 1, 2
 ```
@@ -19,11 +19,11 @@ statement ::= <binary_expression> | <unary_expression> | symbol
 
 unary_expression ::= <unary_operator> <statement>
 
-unary_operator ::= "~" | "□" | "⋄"
+unary_operator ::= "~" | "[]" | "<>"
 
 binary_expression ::= "(" <statement> <binary_operator> <statement> ")"
 
-binary_operator ::= "⇒"
+binary_operator ::= "->"
 
 rule ::= "MP " <line_number> "," <line_number>
   | "L1"
