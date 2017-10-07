@@ -1,7 +1,5 @@
 package nvproof
 
-import scala.util.parsing.combinator._
-
 case class Step(lineNumber: AST.LineNumber, statement: Statement, rule: Rule)
 
 sealed trait Statement
