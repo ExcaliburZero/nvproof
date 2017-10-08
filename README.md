@@ -1,10 +1,49 @@
-# nvproof
-A logic proof validator.
+# Necessarily Valid Proofs (nvproof)
+Necessarily Valid Proofs is a logic proof validator.
 
+```
+$ nvproof examples/example_2.nvp
+1) (P ⇒ Q) AS
+2) P AS
+3) Q MP 1, 2
+-------
+Valid ✓
+```
+
+## Supported Rules
+### Assumption (AS)
+```
+1) (P -> Q) AS
+```
+
+### Modus Ponens (MP)
 ```
 1) (P -> Q) AS
 2) P AS
 3) Q MP 1, 2
+```
+
+### Contraposition (Contra)
+```
+1) (P -> Q) AS
+2) (~Q -> ~P) Contra 1
+```
+
+### Double Negation (DN\*)
+```
+1) (P -> ~~~Q) AS
+2) ~~(~~~~P -> ~Q) DN* 1
+```
+
+### M1
+```
+1) ([]P -> P) M1
+```
+
+### By definition of modal logic (by def modal)
+```
+1) ~<>~([]P -> <>P) AS
+2) [](~<>~P -> ~[]~P) 1 by def modal
 ```
 
 ## Grammar
