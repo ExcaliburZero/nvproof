@@ -28,6 +28,7 @@ object Validation {
       case ModusPonens(ln1, ln2) => validateModusPonens(proof, step, ln1, ln2)
       case Contraposition(ln) => validateContraposition(proof, step, ln)
       case DoubleNegation(ln) => validateDoubleNegation(proof, step, ln)
+      case L1() => validateL1(step)
       case M1() => validateM1(step)
       case ByDefModal(ln) => validateByDefModal(proof, step, ln)
     }
@@ -99,6 +100,28 @@ object Validation {
       None
     } else {
       Some(ErrorMessage(start + f"line $ln is not equivalent to line $ln1 through DN*"))
+    }
+  }
+
+  def validateL1(step: Step): Option[ErrorMessage] = {
+    val ln = step.lineNumber
+    val statement = step.statement
+    val start = f"Invalid L1 on line $ln: "
+
+    statement match {
+      case BinaryExpression(a, Implication(), b) =>
+        b match {
+          case BinaryExpression(c, Implication(), d) =>
+            if (a == d) {
+              None
+            } else {
+              Some(ErrorMessage(start + f"the second operand of the second operand of line $ln ($a) != the first operator of line $ln ($d)"))
+            }
+          case _ =>
+            Some(ErrorMessage(start + f"the second operand of line $ln does not have implication as its primary operator"))
+        }
+      case _ =>
+        Some(ErrorMessage(start + f"line $ln does not have implication as the primary operator"))
     }
   }
 

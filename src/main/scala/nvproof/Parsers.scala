@@ -67,7 +67,7 @@ object Parsers extends RegexParsers {
   }
 
   def rule: Parser[Rule] = {
-    assumption | modusPonens | contraposition | doubleNegation | m1 | byDefModal
+    assumption | modusPonens | contraposition | doubleNegation | l1 | m1 | byDefModal
   }
 
   def assumption: Parser[Rule] = {
@@ -90,6 +90,10 @@ object Parsers extends RegexParsers {
     "DN* " ~ lineNumber ^^ {
       case _ ~ ln => DoubleNegation(ln)
     }
+  }
+
+  def l1: Parser[Rule] = {
+    "L1" ^^ { case _ => L1() }
   }
 
   def m1: Parser[Rule] = {
