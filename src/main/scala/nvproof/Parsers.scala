@@ -67,7 +67,7 @@ object Parsers extends RegexParsers {
   }
 
   def rule: Parser[Rule] = {
-    assumption | modusPonens | contraposition | doubleNegation | l1 | l2 | l3 | m1 | m2 | m3 | m4 | necessitation | byDefModal
+    assumption | modusPonens | contraposition | doubleNegation | l1 | l2 | l3 | m1 | m2 | m3 | m4 | m5 | necessitation | byDefModal
   }
 
   def assumption: Parser[Rule] = {
@@ -118,6 +118,10 @@ object Parsers extends RegexParsers {
 
   def m4: Parser[Rule] = {
     "M4" ^^ { case _ => M4() }
+  }
+
+  def m5: Parser[Rule] = {
+    "M5" ^^ { case _ => M5() }
   }
 
   def necessitation: Parser[Rule] = {

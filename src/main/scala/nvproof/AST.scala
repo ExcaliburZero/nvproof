@@ -79,6 +79,10 @@ case class M4() extends Rule {
   override def toString(): String = f"M4"
 }
 
+case class M5() extends Rule {
+  override def toString(): String = f"M5"
+}
+
 case class Necessitation(lineNumber: AST.LineNumber) extends Rule {
   override def toString(): String = f"Necess $lineNumber"
 }
@@ -141,6 +145,7 @@ object AST {
       case M2() => "M2"
       case M3() => "M3"
       case M4() => "M4"
+      case M5() => "M5"
       case Necessitation(ln1) => f"Necess $ln1"
       case ByDefModal(ln1) => f"$ln1 by def modal"
     }
@@ -163,6 +168,7 @@ object AST {
       case M2() => true
       case M3() => true
       case M4() => true
+      case M5() => true
       case Necessitation(ln1) =>
         isTheorem(proof, ln1)
       case ByDefModal(ln1) =>

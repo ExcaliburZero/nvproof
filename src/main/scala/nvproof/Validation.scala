@@ -35,6 +35,7 @@ object Validation {
       case M2() => validateM2(step)
       case M3() => validateM3(step)
       case M4() => validateM4(step)
+      case M5() => validateM5(step)
       case Necessitation(ln) => validateNecessitation(proof, step, ln)
       case ByDefModal(ln) => validateByDefModal(proof, step, ln)
     }
@@ -268,6 +269,26 @@ object Validation {
         }
       case _ =>
         Some(ErrorMessage(start + f"line $ln does not have the correct structure for an instance of M4"))
+    }
+  }
+
+  def validateM5(step: Step): Option[ErrorMessage] = {
+    val ln = step.lineNumber
+    val statement = step.statement
+    val start = f"Invalid M5 on line $ln: "
+
+    statement match {
+      case BinaryExpression(
+          UnaryExpression(Possible(), a)
+        , Implication()
+        , UnaryExpression(Necessary(), UnaryExpression(Possible(), b))) =>
+        if (a == b) {
+          None
+        } else {
+          Some(ErrorMessage(start + f"first operand on line $ln without possibility ($a) != second operand on line $ln without necessitation and possibility ($b)"))
+        }
+      case _ =>
+        Some(ErrorMessage(start + f"line $ln does not have the correct structure for an instance of M5"))
     }
   }
 
