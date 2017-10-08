@@ -185,7 +185,9 @@ object AST {
         isTheorem(proof, ln1)
       case ACP() => false
       case CP(ln1, ln2) =>
-		(for (n <- ln1 to ln2) yield isTheorem(proof, n)).filter(_ == false).isEmpty
+        // This does not work properly, some extra handling needs to be added
+        // to take into account when ACP steps are tautologies 
+		(for (n <- (ln1 + 1) to ln2) yield isTheorem(proof, n)).filter(_ == false).isEmpty
     }
   }
 }
