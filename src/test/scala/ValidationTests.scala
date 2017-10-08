@@ -120,8 +120,6 @@ class ValidationTests extends FlatSpec with Matchers {
     val proof = Parsers.parse(Parsers.proof, input).get
     val output = Validation.validate(proof, false)
 
-    println(proof)
-
     output shouldBe expected
   }
 

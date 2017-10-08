@@ -2,7 +2,7 @@
 Necessarily Valid Proofs is a logic proof validator.
 
 ```
-$ nvproof examples/example_2.nvp
+$ nvproof complier examples/example_2.nvp
 1) (P ⇒ Q) AS
 2) P AS
 3) Q MP 1, 2
