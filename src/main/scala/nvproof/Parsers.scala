@@ -8,13 +8,33 @@ object Parsers extends RegexParsers {
   private val eol = sys.props("line.separator")
   private val eof = "\\z".r
 
+  def calculateDepths(proof: AST.Proof): AST.Proof = {
+    var depth = 0
+    var steps: AST.Proof = List()
+    for (step <- proof) {
+      step.rule match {
+        case ACP() => depth += 1
+        case CP(_, _) => depth -= 1
+        case _ =>
+      }
+
+      val newStep: Step = step match {
+        case Step(ln, st, rl, _) => Step(ln, st, rl, depth)
+      }
+
+      steps = steps :+ newStep
+    }
+
+    steps
+  }
+
   def proof: Parser[AST.Proof] = {
-    rep(step <~ eol) <~ eof
+    rep(step <~ eol) <~ eof ^^ { pr => calculateDepths(pr) }
   }
 
   def step: Parser[Step] = {
     lineNumber ~ ") " ~ statement ~ " " ~ rule ^^ {
-      case ln ~ _ ~ st ~ _ ~ rl => Step(ln, st, rl)
+      case ln ~ _ ~ st ~ _ ~ rl => Step(ln, st, rl, -1)
     }
   }
 
@@ -67,7 +87,7 @@ object Parsers extends RegexParsers {
   }
 
   def rule: Parser[Rule] = {
-    assumption | modusPonens | contraposition | doubleNegation | l1 | l2 | l3 | m1 | m2 | m3 | m4 | m5 | necessitation | byDefModal
+    assumption | modusPonens | contraposition | doubleNegation | l1 | l2 | l3 | m1 | m2 | m3 | m4 | m5 | necessitation | byDefModal | acp | cp
   }
 
   def assumption: Parser[Rule] = {
@@ -133,6 +153,16 @@ object Parsers extends RegexParsers {
   def byDefModal: Parser[Rule] = {
     lineNumber <~ " by def modal" ^^ {
       case ln => ByDefModal(ln)
+    }
+  }
+
+  def acp: Parser[Rule] = {
+    "ACP" ^^ { case _ => ACP() }
+  }
+
+  def cp: Parser[Rule] = {
+    "CP " ~ lineNumber ~ "-" ~ lineNumber ^^ {
+      case _ ~ ln1 ~ _ ~ ln2 => CP(ln1, ln2)
     }
   }
 }

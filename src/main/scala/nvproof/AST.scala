@@ -1,7 +1,7 @@
 package nvproof
 
-case class Step(lineNumber: AST.LineNumber, statement: Statement, rule: Rule) {
-  override def toString(): String = f"$lineNumber) $statement $rule"
+case class Step(lineNumber: AST.LineNumber, statement: Statement, rule: Rule, depth: Int) {
+  override def toString(): String = ("\t" * depth) + f"$lineNumber) $statement $rule"
 }
 
 
@@ -91,6 +91,14 @@ case class ByDefModal(lineNumber: AST.LineNumber) extends Rule {
   override def toString(): String = f"$lineNumber by def modal"
 }
 
+case class ACP() extends Rule {
+  override def toString(): String = f"ACP"
+}
+
+case class CP(lineNumber1: AST.LineNumber, lineNumber2: AST.LineNumber) extends Rule {
+  override def toString(): String = f"CP $lineNumber1-$lineNumber2"
+}
+
 
 object AST {
   type Proof = List[Step]
@@ -148,6 +156,8 @@ object AST {
       case M5() => "M5"
       case Necessitation(ln1) => f"Necess $ln1"
       case ByDefModal(ln1) => f"$ln1 by def modal"
+      case ACP() => "ACP"
+      case CP(ln1, ln2) => f"CP $ln1-$ln2"
     }
   }
 
@@ -173,6 +183,9 @@ object AST {
         isTheorem(proof, ln1)
       case ByDefModal(ln1) =>
         isTheorem(proof, ln1)
+      case ACP() => false
+      case CP(ln1, ln2) =>
+		(for (n <- ln1 to ln2) yield isTheorem(proof, n)).filter(_ == false).isEmpty
     }
   }
 }

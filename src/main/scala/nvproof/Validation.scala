@@ -25,9 +25,13 @@ object Validation {
 
     rule match {
       case Assumption() => None
-      case ModusPonens(ln1, ln2) => validateModusPonens(proof, step, ln1, ln2)
+      case ModusPonens(ln1, ln2) =>
+        validateModusPonens(proof, step, ln1, ln2)
+          .orElse(checkForAccess(proof, step, List(ln1, ln2)))
       case Contraposition(ln) => validateContraposition(proof, step, ln)
+          .orElse(checkForAccess(proof, step, List(ln)))
       case DoubleNegation(ln) => validateDoubleNegation(proof, step, ln)
+          .orElse(checkForAccess(proof, step, List(ln)))
       case L1() => validateL1(step)
       case L2() => validateL2(step)
       case L3() => validateL3(step)
@@ -37,7 +41,68 @@ object Validation {
       case M4() => validateM4(step)
       case M5() => validateM5(step)
       case Necessitation(ln) => validateNecessitation(proof, step, ln)
+          .orElse(checkForAccess(proof, step, List(ln)))
       case ByDefModal(ln) => validateByDefModal(proof, step, ln)
+          .orElse(checkForAccess(proof, step, List(ln)))
+      case ACP() => None
+      case CP(ln1, ln2) => validateCP(proof, step, ln1, ln2)
+    }
+  }
+
+  private def checkForAccess(proof: AST.Proof, step: Step, lines: List[AST.LineNumber]): Option[ErrorMessage] = {
+    val ln = step.lineNumber
+    val error = f"Invalid access on line $ln: "
+
+    val invalidAccess = findInvalidAccess(proof, step, lines)
+    
+    if (invalidAccess.nonEmpty) {
+      Some(ErrorMessage(error + invalidAccess.mkString(", ")))
+    } else {
+      None
+    }
+  }
+
+  private def findInvalidAccess(proof: AST.Proof, step: Step, lines: List[AST.LineNumber]): List[AST.LineNumber] = {
+    lines match {
+      case Nil => List()
+      case x :: xs =>
+        val access = isAccessable(proof, step, x)
+        val maybeLine = if (!access) {
+          List(x)
+        } else {
+          List()
+        }
+        maybeLine ++ findInvalidAccess(proof, step, xs)
+    }
+  }
+
+  private def isAccessable(proof: AST.Proof, step: Step, ln1: AST.LineNumber): Boolean = {
+    val ln = step.lineNumber
+    val lnDepth = step.depth
+    if (ln1 < ln) {
+      var invalidated = false
+      var prevDepth = lnDepth
+      var decremented = false
+      var incremented = false
+      for (lnLook <- (ln - 1) to ln1 by -1) {
+        val newDepth = getStep(proof, lnLook).depth
+        if (newDepth > prevDepth) {
+          if (decremented) {
+            invalidated = true
+          }
+          incremented = true
+        } else if (newDepth < prevDepth) {
+          decremented = true
+        }
+        prevDepth = newDepth
+      }
+      if (prevDepth > lnDepth) {
+        false
+      } else {
+        !invalidated
+      }
+    } else {
+      false
     }
   }
 
@@ -324,6 +389,26 @@ object Validation {
       None
     } else {
       Some(ErrorMessage(start + f"line $ln is not equivalent to line $ln1 through by def modal"))
+    }
+  }
+
+  def validateCP(proof: AST.Proof, step: Step, ln1: AST.LineNumber, ln2: AST.LineNumber): Option[ErrorMessage] = {
+    val l1 = getStep(proof, ln1).statement
+    val l2 = getStep(proof, ln2).statement
+
+    val ln = step.lineNumber
+    val statement = step.statement
+    val start = f"Invalid CP on line $ln: "
+
+    statement match {
+      case BinaryExpression(a, Implication(), b) =>
+        if (a == l1 && b == l2) {
+          None
+        } else {
+          Some(ErrorMessage(start + f"at least one of the parts of the CP does not match"))
+        }
+      case _ =>
+        Some(ErrorMessage(start + f"line $ln does not have the correct structure for CP"))
     }
   }
 

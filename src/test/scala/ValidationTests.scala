@@ -276,4 +276,36 @@ class ValidationTests extends FlatSpec with Matchers {
 
     output shouldBe expected
   }
+
+  it should "pass a valid proof with conditional proof" in {
+    val input = "1) (P -> (Q -> R)) AS\n" +
+                "2) Q AS\n" +
+                "3) P ACP\n" +
+                "4) (Q -> R) MP 1, 3\n" +
+                "5) R MP 4, 2\n" +
+                "6) (P -> R) CP 3-5\n"
+    val expected = None
+
+    val proof = Parsers.parse(Parsers.proof, input).get
+    val output = Validation.validate(proof, false)
+
+    output shouldBe expected
+  }
+
+  it should "fail a invalid proof with conditional proof" in {
+    val input = "1) (P -> (Q -> R)) AS\n" +
+                "2) Q AS\n" +
+                "3) (P -> S) AS\n" +
+                "4) P ACP\n" +
+                "5) (Q -> R) MP 1, 4\n" +
+                "6) R MP 5, 2\n" +
+                "7) (P -> R) CP 4-6\n" +
+                "8) S MP 3, 4\n" 
+    val expected = Some(List(ErrorMessage("Invalid access on line 8: 4")))
+
+    val proof = Parsers.parse(Parsers.proof, input).get
+    val output = Validation.validate(proof, false)
+
+    output shouldBe expected
+  }
 }

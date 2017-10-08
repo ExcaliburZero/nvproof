@@ -83,6 +83,16 @@ Valid ✓
 
 The line that the necessitation is based on must be a tautology.
 
+### Conditional Proof (ACP + CP)
+```
+1) (P -> (Q -> R)) AS
+2) Q AS
+3) P ACP
+4) (Q -> R) MP 1, 3
+5) R MP 4, 2
+6) (P -> R) CP 3-5
+```
+
 ### By definition of modal logic (by def modal)
 ```
 1) ~<>~([]P -> <>P) AS
