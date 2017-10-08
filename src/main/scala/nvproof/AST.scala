@@ -79,4 +79,55 @@ case class ByDefModal(lineNumber: AST.LineNumber) extends Rule {
 object AST {
   type Proof = List[Step]
   type LineNumber = Int
+
+  def sourcePrint(proof: Proof): String = {
+    (for (step <- proof) yield printStep(step)).mkString("\n") + "\n"
+  }
+
+  private def printStep(step: Step): String = {
+    val lineNumber = step.lineNumber
+    val statement = step.statement
+    val rule = step.rule
+    f"$lineNumber) " + printStatement(statement) + " " + printRule(rule)
+  }
+
+  private def printStatement(statement: Statement): String = {
+    statement match {
+      case Symbol(a) =>
+        a.toString
+      case UnaryExpression(op, st) =>
+        printUnaryOperator(op) + printStatement(st)
+      case BinaryExpression(st1, op, st2) =>
+        printStatement(st1) + " " + printBinaryOperator(op) + " " + printStatement(st2)
+    }
+  }
+
+  private def printUnaryOperator(op: UnaryOperator): String = {
+    op match {
+      case Not() => "~"
+      case Necessary() => "[]"
+      case Possible() => "<>"
+    }
+  }
+
+  private def printBinaryOperator(op: BinaryOperator): String = {
+    op match {
+      case Implication() => "->"
+    }
+  }
+
+  private def printRule(rule: Rule): String = {
+    rule match {
+      case Assumption() => "AS"
+      case ModusPonens(ln1, ln2) => f"MP $ln1, $ln2"
+      case Contraposition(ln1) => f"Contra $ln1"
+      case DoubleNegation(ln1) => f"DN* $ln1"
+      case L1() => "L1"
+      case L2() => "L2"
+      case L3() => "L3"
+      case M1() => "M1"
+      case M2() => "M2"
+      case ByDefModal(ln1) => f"$ln1 by def modal"
+    }
+  }
 }

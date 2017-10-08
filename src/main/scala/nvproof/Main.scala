@@ -1,9 +1,12 @@
 package nvproof
 
+import java.nio.file.{Paths, Files}
+import java.nio.charset.StandardCharsets
 import scala.annotation.tailrec
 
 object Main {
   private val QUIT: String = ":q"
+  private val SAVE: String = ":s"
 
   def main(argv: Array[String]): Unit = {
     argv.toList match {
@@ -46,43 +49,51 @@ object Main {
     val promptString = (prevSteps.length + 1) + ") "
     print(promptString)
     val newStepStringRaw = readLine()
-    val newStepString = if (newStepStringRaw.startsWith(promptString) || newStepStringRaw == QUIT) {
+    val newStepString = if (newStepStringRaw.startsWith(promptString) || newStepStringRaw == QUIT || newStepStringRaw.startsWith(SAVE)) {
       newStepStringRaw
     } else {
       promptString + newStepStringRaw
     }
 
-    newStepString match {
-      case "" =>
+    if (newStepString == "") {
         interpreter(argv, prevSteps)
-      case QUIT =>
+    } else if (newStepString == QUIT) {
         return
-      case _ =>
-        val newStep = Parsers.parse(Parsers.step, newStepString)
+    } else if (newStepString.startsWith(SAVE)) {
+      val fileName = newStepString.substring(SAVE.size + 1)
+      writeFile(fileName, AST.sourcePrint(prevSteps))
+      println(f"Saved proof to $fileName")
+      interpreter(argv, prevSteps)
+    } else {
+      val newStep = Parsers.parse(Parsers.step, newStepString)
 
-        newStep match {
-          case Parsers.Success(matched,_) =>
-            val proof = prevSteps ++ List(matched)
-            Validation.validate(proof, parallel) match {
-              case None =>
-                interpreter(argv, proof)
-              case Some(es) =>
-                for (e <- es) yield println(e.msg)
-                interpreter(argv, prevSteps)
-            }
-          case Parsers.Failure(msg,_) =>
-            println("FAILURE: " + msg)
-            interpreter(argv, prevSteps)
-          case Parsers.Error(msg,_) =>
-            println("ERROR: " + msg)
-            interpreter(argv, prevSteps)
-        }
+      newStep match {
+        case Parsers.Success(matched,_) =>
+          val proof = prevSteps ++ List(matched)
+          Validation.validate(proof, parallel) match {
+            case None =>
+              interpreter(argv, proof)
+            case Some(es) =>
+              for (e <- es) yield println(e.msg)
+              interpreter(argv, prevSteps)
+          }
+        case Parsers.Failure(msg,_) =>
+          println("FAILURE: " + msg)
+          interpreter(argv, prevSteps)
+        case Parsers.Error(msg,_) =>
+          println("ERROR: " + msg)
+          interpreter(argv, prevSteps)
+      }
     }
   }
 
   def readFile(fileName: String): String = {
     val source = scala.io.Source.fromFile(fileName)
     try source.mkString finally source.close()
+  }
+
+  def writeFile(fileName: String, contents: String): Unit = {
+    Files.write(Paths.get(fileName), contents.getBytes(StandardCharsets.UTF_8))
   }
 
   def validateProof(proof: AST.Proof, parallel: Boolean, quiet: Boolean): Unit = {
