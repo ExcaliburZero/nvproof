@@ -3,12 +3,17 @@ package nvproof
 case class ErrorMessage(msg: String)
 
 object Validation {
-  def validate(proof: AST.Proof): Option[List[ErrorMessage]] = {
-    val possibleErrors = for (step <- proof) yield validateStep(proof, step)
+  def validate(proof: AST.Proof, parallel: Boolean): Option[List[ErrorMessage]] = {
+    val possibleErrors = if (parallel) {
+      for (step <- proof.par) yield validateStep(proof, step)
+    } else {
+      for (step <- proof) yield validateStep(proof, step)
+    }
+
     val actualErrors = possibleErrors.flatten
 
     if (actualErrors.nonEmpty) {
-      Some(actualErrors)
+      Some(actualErrors.toList)
     } else {
       None
     }

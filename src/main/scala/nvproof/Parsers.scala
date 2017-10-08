@@ -81,8 +81,8 @@ object Parsers extends RegexParsers {
   }
 
   def contraposition: Parser[Rule] = {
-    "Contra " ~ lineNumber ^^ {
-      case _ ~ ln => Contraposition(ln)
+    "Contra " ~> lineNumber ^^ {
+      case ln => Contraposition(ln)
     }
   }
 
