@@ -55,6 +55,10 @@ case class L1() extends Rule {
   override def toString(): String = f"L1"
 }
 
+case class L2() extends Rule {
+  override def toString(): String = f"L2"
+}
+
 case class M1() extends Rule {
   override def toString(): String = f"M1"
 }
