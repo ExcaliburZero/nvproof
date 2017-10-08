@@ -30,6 +30,7 @@ object Validation {
       case DoubleNegation(ln) => validateDoubleNegation(proof, step, ln)
       case L1() => validateL1(step)
       case L2() => validateL2(step)
+      case L3() => validateL3(step)
       case M1() => validateM1(step)
       case ByDefModal(ln) => validateByDefModal(proof, step, ln)
     }
@@ -147,6 +148,38 @@ object Validation {
         }
       case _ =>
         Some(ErrorMessage(start + f"line $ln does not have the correct structure for an instance of L2"))
+    }
+  }
+
+  def validateL3(step: Step): Option[ErrorMessage] = {
+    val ln = step.lineNumber
+    val statement = step.statement
+    val start = f"Invalid L3 on line $ln: "
+
+    statement match {
+      case BinaryExpression(
+         BinaryExpression(
+            UnaryExpression(Not(), phi)
+          , Implication()
+          , UnaryExpression(Not(), psi)
+          )
+        , Implication()
+        , BinaryExpression(
+            BinaryExpression(
+                UnaryExpression(Not(), a)
+              , Implication()
+              , b
+              )
+          , Implication()
+          , c)
+        ) =>
+        if (a == phi && b == psi && c == phi) {
+          None
+        } else {
+          Some(ErrorMessage(start + f"one or more of the parts of the instance of L3 are incorrect"))
+        }
+      case _ =>
+        Some(ErrorMessage(start + f"line $ln does not have the correct structure for an instance of L3"))
     }
   }
 

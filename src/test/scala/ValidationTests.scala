@@ -113,6 +113,28 @@ class ValidationTests extends FlatSpec with Matchers {
     output shouldBe expected
   }
 
+  it should "pass a valid proof with L3" in {
+    val input = "1) ((~P -> ~Q) -> ((~P -> Q) -> P)) L3\n"
+    val expected = None
+
+    val proof = Parsers.parse(Parsers.proof, input).get
+    val output = Validation.validate(proof, false)
+
+    println(proof)
+
+    output shouldBe expected
+  }
+
+  it should "fail a invalid proof with L3" in {
+    val input = "1) ((~P -> ~P) -> ((~P -> Q) -> P)) L3\n"
+    val expected = Some(List(ErrorMessage("Invalid L3 on line 1: one or more of the parts of the instance of L3 are incorrect")))
+
+    val proof = Parsers.parse(Parsers.proof, input).get
+    val output = Validation.validate(proof, false)
+
+    output shouldBe expected
+  }
+
   it should "pass a valid proof with M1" in {
     val input = "1) ([]~<>P -> ~<>P) M1\n"
     val expected = None
