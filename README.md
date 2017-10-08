@@ -65,6 +65,11 @@ Valid ✓
 1) (P -> []<>P) M3
 ```
 
+### M4
+```
+1) ([]P -> [][]P) M4
+```
+
 ### Necessitation (Necess)
 ```
 1) ([]P -> P) M1

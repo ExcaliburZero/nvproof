@@ -193,6 +193,27 @@ class ValidationTests extends FlatSpec with Matchers {
     output shouldBe expected
   }
 
+  it should "pass a valid proof with M4" in {
+    val input = "1) ([]P -> [][]P) M4\n"
+    val expected = None
+
+    val proof = Parsers.parse(Parsers.proof, input).get
+    val output = Validation.validate(proof, false)
+
+    output shouldBe expected
+  }
+
+  it should "fail a invalid proof with M4" in {
+    val input = "1) ([]P -> [][]Q) M4\n"
+    val expected = Some(List(ErrorMessage("Invalid M4 on line 1: first operand on line 1 without necessitation (P) != second operand on line 1 without two necessitations (Q)")))
+
+    val proof = Parsers.parse(Parsers.proof, input).get
+    val output = Validation.validate(proof, false)
+
+    output shouldBe expected
+  }
+
+
   it should "pass a valid proof with necessitation" in {
     val input = "1) ([]P -> P) M1\n" +
                 "2) []([]P -> P) Necess 1\n"
