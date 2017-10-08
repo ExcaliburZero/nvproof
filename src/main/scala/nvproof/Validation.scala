@@ -327,7 +327,7 @@ object Validation {
       case UnaryExpression(Not(), UnaryExpression(Possible(), UnaryExpression(Not(), a))) =>
         UnaryExpression(Necessary(), removePossible(a))
       case UnaryExpression(Possible(), a) =>
-        UnaryExpression(Not(), UnaryExpression(Necessary(), UnaryExpression(Not(), a)))
+        UnaryExpression(Not(), UnaryExpression(Necessary(), UnaryExpression(Not(), removePossible(a))))
       case UnaryExpression(op, a) =>
         UnaryExpression(op, removePossible(a))
       case BinaryExpression(a, op, b) =>

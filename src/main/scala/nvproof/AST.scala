@@ -110,7 +110,7 @@ object AST {
       case UnaryExpression(op, st) =>
         printUnaryOperator(op) + printStatement(st)
       case BinaryExpression(st1, op, st2) =>
-        printStatement(st1) + " " + printBinaryOperator(op) + " " + printStatement(st2)
+        "(" + printStatement(st1) + " " + printBinaryOperator(op) + " " + printStatement(st2) + ")"
     }
   }
 
