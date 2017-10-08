@@ -55,6 +55,11 @@ Valid ✓
 1) ([]P -> P) M1
 ```
 
+### M2
+```
+1) ([](P -> Q) -> ([]P -> []Q)) M2
+```
+
 ### By definition of modal logic (by def modal)
 ```
 1) ~<>~([]P -> <>P) AS

@@ -67,6 +67,10 @@ case class M1() extends Rule {
   override def toString(): String = f"M1"
 }
 
+case class M2() extends Rule {
+  override def toString(): String = f"M2"
+}
+
 case class ByDefModal(lineNumber: AST.LineNumber) extends Rule {
   override def toString(): String = f"$lineNumber by def modal"
 }

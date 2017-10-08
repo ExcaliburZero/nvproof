@@ -32,6 +32,7 @@ object Validation {
       case L2() => validateL2(step)
       case L3() => validateL3(step)
       case M1() => validateM1(step)
+      case M2() => validateM2(step)
       case ByDefModal(ln) => validateByDefModal(proof, step, ln)
     }
   }
@@ -202,6 +203,34 @@ object Validation {
         }
       case _ =>
         Some(ErrorMessage(start + f"line $ln does not have the correct structure for an instance of M1"))
+    }
+  }
+
+  def validateM2(step: Step): Option[ErrorMessage] = {
+    val ln = step.lineNumber
+    val statement = step.statement
+    val start = f"Invalid M2 on line $ln: "
+
+    statement match {
+      case BinaryExpression(
+          UnaryExpression(
+              Necessary()
+            , BinaryExpression(phi, Implication(), psi)
+            )
+        , Implication()
+        , BinaryExpression(
+            UnaryExpression(Necessary(), a)
+          , Implication()
+          , UnaryExpression(Necessary(), b)
+          )
+        ) =>
+        if (a == phi && b == psi) {
+          None
+        } else {
+          Some(ErrorMessage(start + f"one or more of the parts of the instance of M2 are incorrect"))
+        }
+      case _ =>
+        Some(ErrorMessage(start + f"line $ln does not have the correct structure for an instance of M2"))
     }
   }
 

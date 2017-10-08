@@ -155,6 +155,26 @@ class ValidationTests extends FlatSpec with Matchers {
     output shouldBe expected
   }
 
+  it should "pass a valid proof with M2" in {
+    val input = "1) ([](P -> Q) -> ([]P -> []Q)) M2\n"
+    val expected = None
+
+    val proof = Parsers.parse(Parsers.proof, input).get
+    val output = Validation.validate(proof, false)
+
+    output shouldBe expected
+  }
+
+  it should "fail a invalid proof with M2" in {
+    val input = "1) ([](P -> Q) -> ([]Q -> []P)) M2\n"
+    val expected = Some(List(ErrorMessage("Invalid M2 on line 1: one or more of the parts of the instance of M2 are incorrect")))
+
+    val proof = Parsers.parse(Parsers.proof, input).get
+    val output = Validation.validate(proof, false)
+
+    output shouldBe expected
+  }
+
   it should "pass a valid proof with by def modal" in {
     val input = "1) (~<>~P -> ~~[]P) AS\n" +
                 "2) ([]P -> ~~~<>~P) 1 by def modal\n"
