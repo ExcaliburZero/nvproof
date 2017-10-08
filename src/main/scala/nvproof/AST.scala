@@ -71,6 +71,10 @@ case class M2() extends Rule {
   override def toString(): String = f"M2"
 }
 
+case class Necessitation(lineNumber: AST.LineNumber) extends Rule {
+  override def toString(): String = f"Necess $lineNumber"
+}
+
 case class ByDefModal(lineNumber: AST.LineNumber) extends Rule {
   override def toString(): String = f"$lineNumber by def modal"
 }
@@ -127,7 +131,30 @@ object AST {
       case L3() => "L3"
       case M1() => "M1"
       case M2() => "M2"
+      case Necessitation(ln1) => f"Necess $ln1"
       case ByDefModal(ln1) => f"$ln1 by def modal"
+    }
+  }
+
+  def isTheorem(proof: Proof, ln: LineNumber): Boolean = {
+    val rule = proof(ln - 1).rule
+    rule match {
+      case Assumption() => false
+      case ModusPonens(ln1, ln2) =>
+        isTheorem(proof, ln1) && isTheorem(proof, ln2)
+      case Contraposition(ln1) =>
+        isTheorem(proof, ln1)
+      case DoubleNegation(ln1) =>
+        isTheorem(proof, ln1)
+      case L1() => true
+      case L2() => true
+      case L3() => true
+      case M1() => true
+      case M2() => true
+      case Necessitation(ln1) =>
+        isTheorem(proof, ln1)
+      case ByDefModal(ln1) =>
+        isTheorem(proof, ln1)
     }
   }
 }

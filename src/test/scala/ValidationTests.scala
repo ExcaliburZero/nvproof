@@ -173,6 +173,28 @@ class ValidationTests extends FlatSpec with Matchers {
     output shouldBe expected
   }
 
+  it should "pass a valid proof with necessitation" in {
+    val input = "1) ([]P -> P) M1\n" +
+                "2) []([]P -> P) Necess 1\n"
+    val expected = None
+
+    val proof = Parsers.parse(Parsers.proof, input).get
+    val output = Validation.validate(proof, false)
+
+    output shouldBe expected
+  }
+
+  it should "fail a invalid proof with necessitation" in {
+    val input = "1) ([]P -> P) AS\n" +
+                "2) []([]P -> P) Necess 1\n"
+    val expected = Some(List(ErrorMessage("Invalid necessitation on line 2: line 1 is not a theorem")))
+
+    val proof = Parsers.parse(Parsers.proof, input).get
+    val output = Validation.validate(proof, false)
+
+    output shouldBe expected
+  }
+
   it should "pass a valid proof with by def modal" in {
     val input = "1) (~<>~P -> ~~[]P) AS\n" +
                 "2) ([]P -> ~~~<>~P) 1 by def modal\n"

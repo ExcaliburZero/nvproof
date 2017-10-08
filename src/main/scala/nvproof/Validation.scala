@@ -33,6 +33,7 @@ object Validation {
       case L3() => validateL3(step)
       case M1() => validateM1(step)
       case M2() => validateM2(step)
+      case Necessitation(ln) => validateNecessitation(proof, step, ln)
       case ByDefModal(ln) => validateByDefModal(proof, step, ln)
     }
   }
@@ -231,6 +232,24 @@ object Validation {
         }
       case _ =>
         Some(ErrorMessage(start + f"line $ln does not have the correct structure for an instance of M2"))
+    }
+  }
+
+  def validateNecessitation(proof: AST.Proof, step: Step, ln1: AST.LineNumber): Option[ErrorMessage] = {
+    val l1 = getStep(proof, ln1).statement
+
+    val ln = step.lineNumber
+    val statement = step.statement
+    val start = f"Invalid necessitation on line $ln: "
+
+    if (AST.isTheorem(proof, ln1)) {
+      if (statement == UnaryExpression(Necessary(), l1)) {
+        None
+      } else {
+        Some(ErrorMessage(start + f"line $ln ($statement) does not have the correct structure for necessitation of line $ln1 ($l1)"))
+      }
+    } else {
+      Some(ErrorMessage(start + f"line $ln1 is not a theorem"))
     }
   }
 

@@ -60,6 +60,14 @@ Valid ✓
 1) ([](P -> Q) -> ([]P -> []Q)) M2
 ```
 
+### Necessitation (Necess)
+```
+1) ([]P -> P) M1
+2) []([]P -> P) Necess 1
+```
+
+The line that the necessitation is based on must be a tautology.
+
 ### By definition of modal logic (by def modal)
 ```
 1) ~<>~([]P -> <>P) AS
